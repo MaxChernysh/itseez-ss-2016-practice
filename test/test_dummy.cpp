@@ -22,3 +22,11 @@ TEST(threshold, threshold_test)
 	proc.Threshold(mat.data, mat.cols, mat.rows, 128);
 	EXPECT_EQ(0.0, cv::norm(mat.reshape(1, 1), NORM_L1));
 }
+
+TEST(averaging, averaging_test) 
+{
+	unsigned char mat[] = { 1,1,1,1,1,1,1,1,1 };
+	MatrixProcessor proc;
+	unsigned char* newMat = proc.Averaging(mat, 3, 3, 1);
+	EXPECT_EQ(1, (int)newMat[0]);
+}

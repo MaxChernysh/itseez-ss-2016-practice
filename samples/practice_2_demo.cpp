@@ -26,30 +26,12 @@ struct MouseCallbackState {
 	Point point_second;
 };
 
-static MouseCallbackState mouseState;
-static Mat src;
 
-static void onMouse(int event, int x, int y, int, void*) {
-	if (event == EVENT_LBUTTONDOWN) {
-		mouseState.is_selection_started = true;
-		mouseState.is_selection_finished = false;
-		mouseState.point_first.x = x;
-		mouseState.point_first.y = y;
-	}
-	else if (event == EVENT_LBUTTONUP) {
-		mouseState.is_selection_started = false;
-		mouseState.is_selection_finished = true;
-		mouseState.point_second.x = x;
-		mouseState.point_second.y = y;
-		// Show destination image.
-		const string kDstWindowName = "Destination image";
-		namedWindow(kDstWindowName, WINDOW_NORMAL);
-		resizeWindow(kDstWindowName, 640, 480);
-		ImageProcessorImpl proc = ImageProcessorImpl();
-		Mat dst = proc.CvtColor(src, Rect(mouseState.point_first, mouseState.point_second));
-		imshow(kDstWindowName, dst);
-	}
-			
+
+static void onMouse(int event, int x, int y, int, void* userdata) {
+	MouseCallbackState* mouseState = reinterpret_cast<MouseCallbackState*>(userdata);
+	
+
 }
 
 
@@ -66,16 +48,18 @@ int main(int argc, const char** argv) {
   }
 
   // Read image.
-  src = imread(parser.get<string>(0), CV_LOAD_IMAGE_GRAYSCALE);
+  Mat src = imread(parser.get<string>(0), CV_LOAD_IMAGE_GRAYSCALE);
   if (src.empty()) {
 	  cout << "Failed to open image file '" + parser.get<string>(0) + "'."
 		  << endl;
 	  return 0;
   }
-  mouseState.is_selection_finished = false;
-  mouseState.is_selection_started = false;
-  mouseState.point_first = Point(0, 0);
-  mouseState.point_second = Point(0, 0);
+
+  MouseCallbackState* mouseState = new MouseCallbackState;
+  mouseState->is_selection_finished = false;
+  mouseState->is_selection_started = false;
+  mouseState->point_first = Point(0, 0);
+  mouseState->point_second = Point(0, 0);
 
   // Show source image.
   const string kSrcWindowName = "Source image";
@@ -85,8 +69,10 @@ int main(int argc, const char** argv) {
   imshow(kSrcWindowName, src);
 
   // Set Mouse Callback
-  setMouseCallback(kSrcWindowName, onMouse);
-  waitKey();
+  setMouseCallback(kSrcWindowName, onMouse, mouseState);
 
+
+  waitKey();
+  delete mouseState;
   return 0;
 }

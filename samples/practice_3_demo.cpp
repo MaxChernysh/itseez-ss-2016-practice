@@ -63,9 +63,12 @@ int main(int argc, const char** argv) {
   for (;;) {
 	  video >> srcImg;
 	  detector->Detect(srcImg, objects, scores);
-	  while (objects.begin() != objects.end()) {
+	  /*while (objects.begin() != objects.end()) {
 		  rectangle(srcImg, objects.back(), Scalar(255));
 		  objects.pop_back();
+	  }*/
+	  for (int i = 0; i < objects.size(); ++i) {
+		  rectangle(srcImg, objects[i], CV_RGB(0, 255, 0));
 	  }
 	  imshow(kSrcWindowName, srcImg);
 	  if(waitKey(1) >= 0) break;

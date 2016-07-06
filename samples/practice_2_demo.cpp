@@ -30,7 +30,24 @@ struct MouseCallbackState {
 
 static void onMouse(int event, int x, int y, int, void* userdata) {
 	MouseCallbackState* mouseState = reinterpret_cast<MouseCallbackState*>(userdata);
-	
+	if (event == EVENT_LBUTTONDOWN) {
+		mouseState->is_selection_started = true;
+		mouseState->is_selection_finished = false;
+		mouseState->point_first.x = x;
+		mouseState->point_first.y = y;
+	}
+	if (event == EVENT_LBUTTONUP) {
+		mouseState->is_selection_started = false;
+		mouseState->is_selection_finished = true;
+		mouseState->point_second.x = x;
+		mouseState->point_second.y = y;
+	}
+	if (event == EVENT_MOUSEMOVE) {
+		mouseState->is_selection_started = true;
+		mouseState->is_selection_finished = false;
+		mouseState->point_first.x = x;
+		mouseState->point_first.y = y;
+	}
 
 }
 
